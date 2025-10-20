@@ -4,6 +4,7 @@ import { usersTable } from '../models/index.js';
 import { eq } from 'drizzle-orm';
 import { randomBytes, createHmac } from 'crypto';
 import { signupPostRequestSchema } from '../validation/request.validation.js';
+import { hashPasswordWithSalt } from '../utils/hash.js';
 
 const router = express.Router();
 
@@ -29,8 +30,7 @@ router.get('/', async (req, res) => {
             .status(400)
             .json({ message: `User with this email ${email} already exists` });
     
-    const salt = randomBytes(256).toString('hex');
-    const hashedPassword = createHmac('sha256', salt).update(password).digest('hex');
+    const { salt, password: hashedPassword } = hashPasswordWithSalt(password);
 
     const user = await db.insert(usersTable).values({
         email,
