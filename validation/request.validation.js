@@ -6,3 +6,8 @@ export const signupPostRequestSchema = z.object({
     email: z.email(),
     password: z.string().min(3),
 });
+
+export const loginPostRequestSchema = z.object({
+    email: z.email(),
+    password: z.string().min(3),
+});
