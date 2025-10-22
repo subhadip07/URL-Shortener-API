@@ -3,17 +3,12 @@ import { shortenPostRequestBodySchema } from '../validation/request.validation.j
 import { nanoid } from 'nanoid';
 import { db } from '../db/index.js';
 import { urlsTable } from '../models/index.js';
+import { ensureAuthenticated } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.post('/shorten', async function (req, res){
-    const userID = req.user?.id;
-
-    if (!userID)
-        return res
-        .status(401)
-        .json({ error: 'You must be logged in to access this resource' });
-
+router.post('/shorten', ensureAuthenticated, async function (req, res){
+    
     const validationResult = await shortenPostRequestBodySchema.safeParseAsync(
         req.body
     );
