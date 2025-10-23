@@ -4,8 +4,26 @@ import { nanoid } from 'nanoid';
 import { db } from '../db/index.js';
 import { urlsTable } from '../models/index.js';
 import { ensureAuthenticated } from '../middlewares/auth.middleware.js';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
+
+router.get('/:shortCode', async function (req, res){
+    const code = req.params.shortCode;
+    const [result] = await db
+        .select({
+            targetURL: urlsTable.targetURL,
+        })
+        .from(urlsTable)
+        .where(eq(urlsTable.shortCode, code));
+
+    if (!result)
+    {
+        return res.status(404).json({ error: 'Invalid URL' });
+    }
+
+    return res.redirect(result.targetURL);
+});
 
 router.post('/shorten', ensureAuthenticated, async function (req, res){
     
